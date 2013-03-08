@@ -34,6 +34,10 @@ public class PageRenderer implements GLSurfaceView.Renderer {
         return projectionMatrix;
     }
 
+    public float getFactor() {
+        return factor;
+    }
+
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
@@ -76,15 +80,18 @@ public class PageRenderer implements GLSurfaceView.Renderer {
         };
         this.mesh.setTopPolygon(polygon);
 
+        //设置底部多边形
         float _y = targetRect.top - 2 * (targetRect.top - y);
         polygon = new float[]{
                 x, y, 0,
                 targetRect.left, _y, 0,
                 -x, y, 0,
                 targetRect.right, _y, 0
-
         };
         this.mesh.setBottom(polygon);
+
+        //设置阴影多边形
+        this.mesh.setShadow(polygon);
     }
 
     public void startAnimation(final GLSurfaceView view) {
