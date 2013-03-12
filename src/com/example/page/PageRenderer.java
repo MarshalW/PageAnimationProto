@@ -54,8 +54,8 @@ public class PageRenderer implements GLSurfaceView.Renderer {
         targetRect = new RectF();
         targetRect.left = -ratio;
         targetRect.right = ratio;
-        targetRect.top = 1;
-        targetRect.bottom = 0;
+        targetRect.top = 0.5f;
+        targetRect.bottom = -0.1f;
     }
 
     @Override
@@ -72,26 +72,33 @@ public class PageRenderer implements GLSurfaceView.Renderer {
         float k = (z - 5) / (-ratio);
         float x = -5 / k; //TODO 这个值不对，只能算近似解，有空改进
 
-        float[] polygon = new float[]{
-                targetRect.left, targetRect.top, 0,
-                x, y, 0,
-                targetRect.right, targetRect.top, 0,
-                -x, y, 0
+        float _y = targetRect.top - 2 * (targetRect.top - y);
+
+        //如果屏蔽这行就是从上往下折叠
+        float deltaY=targetRect.top-targetRect.bottom-(targetRect.top-_y)+targetRect.top;
+//        float deltaY=0;
+
+        float[] polygonTop = new float[]{
+                targetRect.left, targetRect.top-deltaY, 0,
+                x, y-deltaY, 0,
+                targetRect.right, targetRect.top-deltaY, 0,
+                -x, y-deltaY, 0
         };
-        this.mesh.setTopPolygon(polygon);
 
         //设置底部多边形
-        float _y = targetRect.top - 2 * (targetRect.top - y);
-        polygon = new float[]{
-                x, y, 0,
-                targetRect.left, _y, 0,
-                -x, y, 0,
-                targetRect.right, _y, 0
+
+        float[] polygonBottom = new float[]{
+                x, y-deltaY, 0,
+                targetRect.left, _y-deltaY, 0,
+                -x, y-deltaY, 0,
+                targetRect.right, _y-deltaY, 0
         };
-        this.mesh.setBottom(polygon);
+
+        this.mesh.setTopPolygon(polygonTop);
+        this.mesh.setBottom(polygonBottom);
 
         //设置阴影多边形
-        this.mesh.setShadow(polygon);
+        this.mesh.setShadow(polygonBottom);
     }
 
     public void startAnimation(final GLSurfaceView view) {
